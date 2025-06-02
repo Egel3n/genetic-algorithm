@@ -53,11 +53,11 @@ function fitness(board) {
   let score = 0;
 
   // 1. Diagonal renkler farklı mı?
-  const diagonalColors = new Set();
+  const diagonal = [];
   for (let i = 0; i < 5; i++) {
-    diagonalColors.add(board[i][i]);
+    diagonal.push(board[i][i]);
   }
-  if (diagonalColors.size === 5) {
+  if (new Set(diagonal).size === 1) {
     score += 5;
   }
 
@@ -274,8 +274,8 @@ function runGA({
 }
 
 runGA({
-  populationSize: 1000,
-  generations: 10000,
+  populationSize: 500,
+  generations: 500,
   mutationRate: 0.1,
   eliteCount: 3,
 });
