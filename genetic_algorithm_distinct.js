@@ -251,7 +251,7 @@ function runGA({
 
 runGA({
   populationSize: 500,
-  generations: 500,
+  generations: 1000,
   mutationRate: 0.1,
   eliteCount: 3,
 });

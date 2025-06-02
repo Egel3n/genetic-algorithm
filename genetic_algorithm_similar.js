@@ -44,7 +44,7 @@ function printBoard(board, score) {
   console.log();
 }
 
-// +5 puan eger diagonal farkli renkse
+// +5 puan eger diagonal aynı renkse
 // +1 puan eger row ayni renkse
 // -2 puan her eksik ve fazla tas icin
 function fitness(board) {
@@ -104,14 +104,13 @@ function crossover(parent1, parent2) {
   const flatten2 = parent2.flat();
 
   const child = [];
-  const colorCount = {};
 
   // 1. Ebeveynden ilk kısmı al
   const cutPoint = Math.floor(Math.random() * 25);
+
   for (let i = 0; i < cutPoint; i++) {
     const color = flatten1[i];
     child.push(color);
-    colorCount[color] = (colorCount[color] || 0) + 1;
   }
 
   // 2. Ebeveynden geri kalanı al
@@ -230,7 +229,7 @@ function runGA({
 
   for (let gen = 0; gen < generations; gen++) {
     population.sort((a, b) => b.fitness - a.fitness); //azalan şekilde sırala
-    const elites = population.slice(0, eliteCount);
+    const elites = population.slice(0, eliteCount); //elitizm
 
     const newPopulation = [...elites];
 
