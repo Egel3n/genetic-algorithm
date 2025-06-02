@@ -261,7 +261,7 @@ function runGA({
     console.log(
       chalk.bold(`\n📈 Generation ${gen + 1} - Best Fitness: ${best.fitness}`)
     );
-    if (best.fitness === 10) {
+    if (best.fitness === 9) {
       console.log(chalk.greenBright("\n🎉 Mükemmel çözüm bulundu!"));
       printBoard(best.board, best.fitness);
       return;
