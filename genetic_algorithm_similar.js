@@ -9,24 +9,23 @@ const COLOR_CODES = {
   Purple: chalk.magenta(" P "),
 };
 
-// 🔁 25 taşı oluştur, karıştır ve 5x5 matrise yerleştir
 function generateRandomBoard() {
   const stones = [];
 
-  // 5'er taş ekle
+  // Her renkten 5 taş ekle
   for (const color of COLORS) {
     for (let i = 0; i < 5; i++) {
       stones.push(color);
     }
   }
 
-  // Fisher-Yates Shuffle
+  // Taşları Karıştır
   for (let i = stones.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [stones[i], stones[j]] = [stones[j], stones[i]];
   }
 
-  // 5x5 matris oluştur
+  // Arrayi matris yap
   const board = [];
   for (let i = 0; i < 5; i++) {
     board.push(stones.slice(i * 5, (i + 1) * 5));
@@ -35,7 +34,6 @@ function generateRandomBoard() {
   return board;
 }
 
-// 🎨 Renkli olarak konsola yaz
 function printBoard(board, score) {
   console.log(
     chalk.bold("\n", chalk.red("Board Score:"), chalk.whiteBright(score))
@@ -52,7 +50,6 @@ function printBoard(board, score) {
 function fitness(board) {
   let score = 0;
 
-  // 1. Diagonal renkler farklı mı?
   const diagonal = [];
   for (let i = 0; i < 5; i++) {
     diagonal.push(board[i][i]);
@@ -61,10 +58,10 @@ function fitness(board) {
     score += 5;
   }
 
-  // 2. Satırda diagonal dışı hücreler aynı mı?
+  // satır kontrolü
   for (let i = 0; i < 5; i++) {
     const row = board[i];
-    const refColor = row.find((_, j) => j !== i); // ilk non-diagonal
+    const refColor = row.find((_, j) => j !== i);
     let allSame = true;
     for (let j = 0; j < 5; j++) {
       if (j !== i && row[j] !== refColor) {
@@ -75,7 +72,7 @@ function fitness(board) {
     if (allSame) score += 1;
   }
 
-  // 3. Her renkten 5 adet mi?
+  // Taş sayısı kontrolü
   const flat = board.flat();
   const count = {};
   for (const color of flat) {
@@ -84,7 +81,7 @@ function fitness(board) {
 
   for (const color of COLORS) {
     const diff = Math.abs((count[color] || 0) - 5);
-    score -= diff * 2; // her fazla/eksik taş için -2 ceza
+    score -= diff * 2;
   }
 
   return score;
@@ -117,16 +114,12 @@ function crossover(parent1, parent2) {
     colorCount[color] = (colorCount[color] || 0) + 1;
   }
 
-  // 2. Ebeveynden geri kalanı al (fazla taş varsa atla)
+  // 2. Ebeveynden geri kalanı al
   for (let i = 0; i < 25 && child.length < 25; i++) {
     const color = flatten2[i];
-    if ((colorCount[color] || 0) < 5) {
-      child.push(color);
-      colorCount[color] = (colorCount[color] || 0) + 1;
-    }
+    child.push(color);
   }
 
-  // 5x5 board'a dönüştür
   const board = [];
   for (let i = 0; i < 5; i++) {
     board.push(child.slice(i * 5, (i + 1) * 5));
@@ -157,6 +150,7 @@ function mutate2(board, mutationRate = 0.1) {
 
   return mutated;
 }
+
 function mutate(board, mutationRate = 0.1) {
   const flat = board.flat();
 
@@ -202,7 +196,6 @@ function mutate(board, mutationRate = 0.1) {
     }
   }
 
-  // 5x5 board'a çevir
   const mutated = [];
   for (let i = 0; i < 5; i++) {
     mutated.push(flat.slice(i * 5, (i + 1) * 5));
@@ -223,7 +216,7 @@ function rouletteWheelSelection(population) {
     }
   }
 
-  // fallback
+  // nolur nolmaz kimse seçilemezse diye
   return population[population.length - 1];
 }
 
@@ -236,13 +229,11 @@ function runGA({
   let population = generatePopulation(populationSize);
 
   for (let gen = 0; gen < generations; gen++) {
-    // 🎯 En iyi bireyleri sırala
-    population.sort((a, b) => b.fitness - a.fitness);
+    population.sort((a, b) => b.fitness - a.fitness); //azalan şekilde sırala
     const elites = population.slice(0, eliteCount);
 
-    const newPopulation = [...elites]; // elitleri doğrudan al
+    const newPopulation = [...elites];
 
-    // 🎲 Yeni bireyler üret
     while (newPopulation.length < populationSize) {
       const parent1 = rouletteWheelSelection(population).board;
       const parent2 = rouletteWheelSelection(population).board;
@@ -256,7 +247,7 @@ function runGA({
 
     population = newPopulation;
 
-    // Her jenerasyonda en iyiyi yazdır
+    // Her gende en iyi fitness değerini yazdır
     const best = population[0];
     console.log(
       chalk.bold(`\n📈 Generation ${gen + 1} - Best Fitness: ${best.fitness}`)
@@ -268,14 +259,13 @@ function runGA({
     }
   }
 
-  // Bittiğinde en iyiyi göster
   console.log(chalk.bold.red("\n⛔ Maksimum jenerasyona ulaşıldı."));
   printBoard(population[0].board, population[0].fitness);
 }
 
 runGA({
-  populationSize: 500,
-  generations: 500,
+  populationSize: 100,
+  generations: 1000,
   mutationRate: 0.1,
   eliteCount: 3,
 });
